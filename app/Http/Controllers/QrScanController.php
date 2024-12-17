@@ -44,6 +44,7 @@ class QrScanController extends Controller
 
         return redirect()->back()->with('status', 'QR Code scanned logs deleted successfully.');
     }
+    
 
     // public function showDetails($id)
     // {

@@ -6,15 +6,17 @@ use App\Models\QR_Code;
 use Illuminate\Http\Request;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
 use Illuminate\Support\Facades\Storage;
-
+use Illuminate\Support\Facades\File;
 
 class QRCodeController extends Controller
 {
 
     public function index()  // Display all genearted QR codes
     {
-        $data = QR_Code::all();
-        return view('admin.index', compact('data'));
+        // $paginate = QR_Code::paginate(5);
+        $data = QR_Code::orderBy('created_at', 'desc')->paginate(5);
+        $total_qrcodes  = Qr_Code::count();
+        return view('admin.index', compact('data', 'total_qrcodes', 'paginate'));
     }
 
     public function store(Request $request) // Generate QR codes
@@ -30,7 +32,10 @@ class QRCodeController extends Controller
         $qrCodeRecord = Qr_Code::create($validatedData);
 
         // Generate QR Code data
-        // $data = 'Owner: ' . $qrCodeRecord->owner_name . ', Device: ' . $qrCodeRecord->device_name . ', Type: ' . $qrCodeRecord->device_type;
+        // $data = 'ID: ' . $qrCodeRecord->id . "\n" .
+        //     'Owner: ' . $qrCodeRecord->owner_name . "\n" .
+        //     'Device: ' . $qrCodeRecord->device_name . "\n" .
+        //     'Type: ' . $qrCodeRecord->device_type;
 
         // Generate the QR Code URL (route to handle scans)
         $scanUrl = route('qr-code.details', ['id' => $qrCodeRecord->id]);
@@ -144,10 +149,55 @@ class QRCodeController extends Controller
 
     public function destroy($id) // Deleted Generate QR codes
     {
+        // Find the QR code record in the database
         $data = Qr_Code::findOrFail($id);
         $data->delete();
+        return redirect()->back()->with('status', 'QR Code and file added to archive.');
+    }
 
-        return redirect()->back()->with('status', 'QR Code deleted successfully.');
+    public function forceDeleteQrCode($id)
+    {
+        // Find the soft-deleted record
+        $qrCode = Qr_Code::withTrashed()->findOrFail($id);
+
+        // Get the file path
+        $filePath = public_path($qrCode->qr_code_path); // Ensure this column stores the correct file path
+
+        // Check if the file exists
+        if (File::exists($filePath)) {
+            // Delete the file
+            File::unlink($filePath);
+        }
+
+        // Delete the record permanently (this triggers the isForceDeleting logic)
+        $qrCode->forceDelete();
+        return redirect()->back()->with('status', 'QR Code has been permanently deleted.');
+    }
+    
+    public function restoreQrCode($id)
+    {
+        // Find the soft-deleted record
+        $qrCode = Qr_Code::withTrashed()->findOrFail($id);
+
+        // Restore the record
+        $qrCode->restore();
+
+        // Move the file back to the original location
+        $archivePath = public_path('qrcodes/archive/' . basename($qrCode->qr_code_path));
+        $originalPath = public_path($qrCode->qr_code_path);
+
+        if (file_exists($archivePath)) {
+            @mkdir(dirname($originalPath), 0755, true); // Create the folder if it doesn't exist
+            rename($archivePath, $originalPath); // Move the file back to the original location
+        }
+
+        return redirect()->back()->with('status', 'QR Code has been restored.');
+    }
+
+    public function showArchived() {
+        $archivedQrCodes = Qr_Code::onlyTrashed()->paginate(10);
+        $total_archive_deleted  = Qr_Code::onlyTrashed()->get()->count();
+        return view('admin.qrcodes_archive.archive', compact('archivedQrCodes', 'total_archive_deleted'));
     }
 
     public function downloadQrCode($id) // Download Generate QR codes
@@ -177,25 +227,4 @@ class QRCodeController extends Controller
         // Return the file as a download response
         return response()->download($tempPath, $fileName)->deleteFileAfterSend();
     }
-
-    // public function downloadQrCode($id)
-    // {
-    //     $qrCodeRecord = Qr_Code::findOrFail($id);
-
-    //     // Generate the URL for showing details
-    //     $detailsUrl = route('qr-code.details', ['id' => $qrCodeRecord->id]);
-
-    //     // Generate and save the QR code
-    //     $qrCodePath = 'qrcodes_generated/' . $qrCodeRecord->id . '.png';
-    //     QrCode::size(300)
-    //         ->format('png')
-    //         ->generate($detailsUrl, Storage::path($qrCodePath));
-
-    //     // Update the record with the QR code path
-    //     $qrCodeRecord->qr_code_path = $qrCodePath;
-    //     $qrCodeRecord->save();
-
-    //     // return response()->download(Storage::path($qrCodePath))->with('message', 'QR Code downloaded successfully!');
-    //     return redirect()->download(Storage::path($qrCodePath))->with('status', 'QR Code downloaded successfully!');
-    // }
 }

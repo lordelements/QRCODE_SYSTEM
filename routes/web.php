@@ -43,10 +43,14 @@ Route::get('admin/show/{id}', [QRCodeController::class, 'show'])->name('admin.sh
 Route::post('store/qr_code', [QRCodeController::class, 'store'])->name('store.qr_code');
 
 Route::get('admin/{id}/download-qr-code', [QRCodeController::class, 'downloadQrCode'])->name('admin.download_qr_code');
-Route::delete('admin/delete/{id}', [QRCodeController::class, 'destroy'])->name('admin.destroy');
 
 Route::put('admin/update/{id}', [QRCodeController::class, 'update'])->name('admin.update');
+Route::delete('admin/delete/{id}', [QRCodeController::class, 'destroy'])->name('admin.destroy');
 
+Route::delete('/qr-code/force-delete/{id}', [QRCodeController::class, 'forceDeleteQrCode'])->name('qr-code.forceDelete');
+Route::patch('/qr-code/restore/{id}', [QRCodeController::class, 'restoreQrCode'])->name('qr-code.restore');
+Route::get('/qr-code/archive', [QRCodeController::class, 'archive'])->name('qr-code.archive');
+Route::get('/qr-codes/archived', [QRCodeController::class, 'showArchived'])->name('qr-codes.archived');
 
 //  Routes for scanning
 Route::get('/scan/{id}', [QrScanController::class, 'handleScan'])->name('qr-code.details'); // Routes for handling qrcodes scanned logs
