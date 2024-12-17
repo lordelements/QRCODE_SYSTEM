@@ -51,6 +51,8 @@ Route::delete('/qr-code/force-delete/{id}', [QRCodeController::class, 'forceDele
 Route::patch('/qr-code/restore/{id}', [QRCodeController::class, 'restoreQrCode'])->name('qr-code.restore');
 Route::get('/qr-code/archive', [QRCodeController::class, 'archive'])->name('qr-code.archive');
 Route::get('/qr-codes/archived', [QRCodeController::class, 'showArchived'])->name('qr-codes.archived');
+Route::get('/qr-code/edit/{id}', [QRCodeController::class, 'editForm']);
+Route::put('/qr-codes/update/{id}', [QRCodeController::class, 'update'])->name('qr-codes.update');
 
 //  Routes for scanning
 Route::get('/scan/{id}', [QrScanController::class, 'handleScan'])->name('qr-code.details'); // Routes for handling qrcodes scanned logs

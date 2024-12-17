@@ -13,10 +13,9 @@ class QRCodeController extends Controller
 
     public function index()  // Display all genearted QR codes
     {
-        // $paginate = QR_Code::paginate(5);
         $data = QR_Code::orderBy('created_at', 'desc')->paginate(5);
         $total_qrcodes  = Qr_Code::count();
-        return view('admin.index', compact('data', 'total_qrcodes', 'paginate'));
+        return view('admin.index', compact('data', 'total_qrcodes'));
     }
 
     public function store(Request $request) // Generate QR codes
@@ -58,6 +57,7 @@ class QRCodeController extends Controller
         // Redirect back with a success message
         return redirect()->back()->with('status', 'QR Code created successfully.');
     }
+
 
     // public function store(Request $request)
     // {
@@ -137,6 +137,58 @@ class QRCodeController extends Controller
     //     return redirect()->back()->with('status', 'Device created successfully!');
     // }
 
+    public function editForm($id)
+    {
+
+        $qrCode = Qr_Code::findOrFail($id); // Fetch the device by ID
+
+        // Return the edit form view
+        return view('admin.qrcode_editForm', compact('qrCode'));
+    }
+
+    public function update(Request $request, $id)
+    {
+        // Validate the input data
+        $validatedData = $request->validate([
+            'device_type' => 'required|string',
+            'device_name' => 'required|string',
+            'owner_name' => 'required|string',
+        ]);
+
+
+        // Fetch the device by UUID
+        $qrCode = Qr_Code::where('id', $id)->firstOrFail();
+
+        // Update the device details
+        $qrCode->update($validatedData);
+
+        // // Regenerate QR Code data with updated details
+        // $data = 'UUID: ' . $device->uuid . "\n" .
+        //     'Owner: ' . $device->owner_name . "\n" .
+        //     'Device: ' . $device->device_name . "\n" .
+        //     'Type: ' . $device->device_type;
+
+        // Generate the QR Code URL (route to handle scans)
+        $scanUrl = route('qr-code.details', ['id' => $qrCode->id]);
+
+
+        // Generate the QR code and save it as an image
+        $qrCodePath = 'qrcodes_generated/' . $qrCode->id . '.png';
+
+        QrCode::size(300)
+            ->style('dot')
+            ->eye('circle')
+            ->color(0, 0, 255)
+            ->margin(1)
+            ->format('png')
+            ->generate($scanUrl, public_path($qrCodePath));
+
+        // Update the record with the QR code file path
+        $qrCode->update(['qr_code_path' => $qrCodePath]);
+
+        // Redirect back with a success message
+        return redirect()->back()->with('status', 'QR Code updated successfully.');
+    }
 
     public function show(Qr_Code $request, $id) // Show details of each Generate QR codes
     {
@@ -173,7 +225,7 @@ class QRCodeController extends Controller
         $qrCode->forceDelete();
         return redirect()->back()->with('status', 'QR Code has been permanently deleted.');
     }
-    
+
     public function restoreQrCode($id)
     {
         // Find the soft-deleted record
@@ -194,7 +246,8 @@ class QRCodeController extends Controller
         return redirect()->back()->with('status', 'QR Code has been restored.');
     }
 
-    public function showArchived() {
+    public function showArchived()
+    {
         $archivedQrCodes = Qr_Code::onlyTrashed()->paginate(10);
         $total_archive_deleted  = Qr_Code::onlyTrashed()->get()->count();
         return view('admin.qrcodes_archive.archive', compact('archivedQrCodes', 'total_archive_deleted'));
