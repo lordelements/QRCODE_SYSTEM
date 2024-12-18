@@ -8,6 +8,8 @@
     <meta name="description" content="">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="robots" content="all,follow">
+
+
     <!-- Bootstrap CSS-->
     <link href="{{ asset('theme/vendor/bootstrap/css/bootstrap.min.css') }}" rel="stylesheet" />
     
@@ -56,6 +58,7 @@
         </div>
     </div>
 
+     
      <!-- JavaScript files-->
      <script src="{{ asset('theme/vendor/jquery/jquery.min.js') }}"></script>
      <script src="{{ asset('theme/vendor/popper.js/umd/popper.min.js') }}"></script>

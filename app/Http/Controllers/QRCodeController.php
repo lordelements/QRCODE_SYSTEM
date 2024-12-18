@@ -13,7 +13,8 @@ class QRCodeController extends Controller
 
     public function index()  // Display all genearted QR codes
     {
-        $data = QR_Code::orderBy('created_at', 'desc')->paginate(5);
+        
+        $data = QR_Code::orderBy('created_at', 'desc')->get();
         $total_qrcodes  = Qr_Code::count();
         return view('admin.index', compact('data', 'total_qrcodes'));
     }
@@ -57,7 +58,6 @@ class QRCodeController extends Controller
         // Redirect back with a success message
         return redirect()->back()->with('status', 'QR Code created successfully.');
     }
-
 
     // public function store(Request $request)
     // {
@@ -137,24 +137,22 @@ class QRCodeController extends Controller
     //     return redirect()->back()->with('status', 'Device created successfully!');
     // }
 
-    public function editForm($id)
+    public function editForm($id) // QR Code Edit Form
     {
 
         $qrCode = Qr_Code::findOrFail($id); // Fetch the device by ID
+        return view('admin.qrcode_editForm', compact('qrCode')); // Return the edit form view
 
-        // Return the edit form view
-        return view('admin.qrcode_editForm', compact('qrCode'));
     }
 
-    public function update(Request $request, $id)
+    public function update(Request $request, $id) // QR Code Update function
     {
         // Validate the input data
         $validatedData = $request->validate([
-            'device_type' => 'required|string',
+            'device_type' => 'required|string|in:Laptop,Tablet,Phone,Earphone,Other',
             'device_name' => 'required|string',
             'owner_name' => 'required|string',
         ]);
-
 
         // Fetch the device by UUID
         $qrCode = Qr_Code::where('id', $id)->firstOrFail();
@@ -207,7 +205,7 @@ class QRCodeController extends Controller
         return redirect()->back()->with('status', 'QR Code and file added to archive.');
     }
 
-    public function forceDeleteQrCode($id)
+    public function forceDeleteQrCode($id) //Sofdelete Function
     {
         // Find the soft-deleted record
         $qrCode = Qr_Code::withTrashed()->findOrFail($id);
@@ -226,7 +224,7 @@ class QRCodeController extends Controller
         return redirect()->back()->with('status', 'QR Code has been permanently deleted.');
     }
 
-    public function restoreQrCode($id)
+    public function restoreQrCode($id) // Restore Function
     {
         // Find the soft-deleted record
         $qrCode = Qr_Code::withTrashed()->findOrFail($id);
@@ -246,7 +244,7 @@ class QRCodeController extends Controller
         return redirect()->back()->with('status', 'QR Code has been restored.');
     }
 
-    public function showArchived()
+    public function showArchived() //Display archive data on a table
     {
         $archivedQrCodes = Qr_Code::onlyTrashed()->paginate(10);
         $total_archive_deleted  = Qr_Code::onlyTrashed()->get()->count();

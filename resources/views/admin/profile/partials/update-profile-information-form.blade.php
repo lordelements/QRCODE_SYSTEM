@@ -3,9 +3,16 @@
         @csrf
     </form>
 
-    <form method="post" action="{{ route('admin.profile.update') }}" class="mt-6 space-y-6" role="form">
+    <form method="post" action="{{ route('admin.profile.update') }}" class="mt-6 space-y-6" role="form" enctype="multipart/form-data">
         @csrf
         @method('patch')
+
+        <!-- Profile Picture -->
+        <div class="form-group">
+            <label for="profile_picture" class="text-light">Profile Picture</label>
+            <x-text-input id="profile_picture" class="form-control" type="file" name="profile_picture" :value="old('profile_picture')" required autofocus autocomplete="profile_picture" />
+            <x-input-error :messages="$errors->get('profile_picture')" class="mt-2" />
+        </div>
 
         <div class="form-group">
             <label for="name" class="text-light">Name</label>

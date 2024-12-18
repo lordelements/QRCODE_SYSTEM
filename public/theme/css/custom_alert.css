@@ -1,0 +1,27 @@
+
+    .alert {
+        padding: 15px;
+        border: 1px solid transparent;
+        border-radius: 5px;
+        position: relative;
+        margin-bottom: 20px;
+        transition: opacity 0.5s ease-in-out;
+    }
+
+    .alert-dismissible .btn-close {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        background: none;
+        border: none;
+    }
+
+    .alert-success {
+        background-color: #d4edda;
+        border-color: #c3e6cb;
+        color: #155724;
+    }
+
+    .fade {
+        opacity: 0;
+    }

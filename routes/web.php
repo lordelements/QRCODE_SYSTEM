@@ -30,12 +30,14 @@ Route::get('admin/dashboard', [HomeController::class, 'index'])->name('admin.das
 
 // Route::get('admin/profile/edit', [AdminController::class, 'edit'])->name('admin.profile.edit')->middleware(['auth', 'verified', 'admin']);
 // Route::patch('admin/profile/update', [AdminController::class, 'update'])->name('admin.profile.update');
-// Route::delete('admin/profile', [AdminController::class, 'destroy'])->name('admin.profile.delete');
+Route::delete('/delete/user/{id}', [AdminController::class, 'deleteRegisteredUser'])->name('admin.delete.user');
 
 Route::middleware('auth')->group(function () {
     Route::get('admin/profile/edit', [AdminController::class, 'edit'])->name('admin.profile.edit')->middleware(['auth', 'verified', 'admin']);
     Route::patch('admin/profile/update', [AdminController::class, 'update'])->name('admin.profile.update');
     Route::delete('admin/profile', [AdminController::class, 'destroy'])->name('admin.profile.delete');
+    Route::get('admin/registeredusers', [AdminController::class, 'users'])->name('admin.registeredusers')->middleware(['auth', 'verified', 'admin']);
+
 });
 
 Route::get('admin/index', [QRCodeController::class, 'index'])->name('admin.index');
@@ -59,6 +61,3 @@ Route::get('/scan/{id}', [QrScanController::class, 'handleScan'])->name('qr-code
 Route::get('scanlog/index', [QrScanController::class, 'index'])->name('scanlog.index'); // Routes for showing qrcodes scanned logs
 // Route::get('/scan/{id}', [QrScanController::class, 'showDetails'])->name('qr-code.details'); // Routes when qrcodes scanned it shows details
 Route::delete('scan/delete/{id}', [QrScanController::class, 'destroy'])->name('scanlog.destroy');
-
-// Route::post('/scan/process', [QrScanController::class, 'processScan'])->name('qr.process');
-// Route::post('/scan', [QrCodeController::class, 'logScan'])->name('qr.logScan');

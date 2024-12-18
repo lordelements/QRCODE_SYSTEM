@@ -31,14 +31,22 @@ class RegisteredUserController extends Controller
     {
         $request->validate([
             'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.User::class],
+            'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:' . User::class],
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
+            'profile_picture' => ['nullable', 'image','mimes:jpeg,png,jpg', 'max:2048'], // Ensure the file is an image and under 2MB
         ]);
+
+        // Check if a profile picture is uploaded and store it
+        $profilePicturePath = null;
+        if ($request->hasFile('profile_picture')) {
+            $profilePicturePath = $request->file('profile_picture')->store('profile_pictures', 'public');
+        }
 
         $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
+            'profile_picture' => $profilePicturePath, // Save the path to the database
         ]);
 
         event(new Registered($user));
@@ -47,4 +55,5 @@ class RegisteredUserController extends Controller
 
         return redirect(route('dashboard', absolute: false));
     }
+    
 }

@@ -9,9 +9,14 @@
     </div>
     <div class="card card-body blur shadow-blur mx-4 mt-n6 overflow-hidden">
         <div class="row gx-4">
+
+            @if (Auth::check())
             <div class="col-auto">
                 <div class="avatar avatar-xl position-relative">
-                    <img src="../assets/img/bruce-mars.jpg" alt="profile_image" class="w-100 border-radius-lg shadow-sm">
+                    <img
+                        src="{{ Auth::user()->profile_picture ? asset('storage/' . Auth::user()->profile_picture) : asset('images/default-profile.png') }}"
+                        alt="Profile Picture"
+                        class="w-100 border-radius-lg shadow-sm">
                 </div>
             </div>
             <div class="col-auto my-auto">
@@ -19,11 +24,12 @@
                     <h5 class="mb-1">
                         {{ Auth::user()->name }}
                     </h5>
-                    <p class="mb-0 font-weight-bold text-sm">
-                        CEO / Co-Founder
-                    </p>
                 </div>
             </div>
+            @else
+            <a href="{{ route('login') }}">Login</a>
+            @endif
+
         </div>
     </div>
 </div>
