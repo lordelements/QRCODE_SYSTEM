@@ -38,10 +38,16 @@
                         <td>{{ $qrCode->device_name }}</td>
                         <td>{{ $qrCode->owner_name }}</td>
                         <td>
-                            @if(file_exists(public_path('qrcodes/archive/' . basename($qrCode->qr_code_path))))
+                            <!-- @if(file_exists(public_path('qrcodes/archive/' . basename($qrCode->qr_code_path))))
                             <img src="{{ asset('qrcodes/archive/' . basename($qrCode->qr_code_path)) }}" alt="QR Code" width="100">
                             @else
                             <img src="{{ asset($qrCode->qr_code_path) }}" alt="QR Code" width="100">
+                            @endif -->
+
+                            @if ($qrCode->archived_qr_code_url)
+                            <img src="{{ $qrCode->archived_qr_code_url }}" alt="Archived QR Code" width="100">
+                            @else
+                            <span>QR Code not found in archive</span>
                             @endif
                         </td>
                         <td>{{ $qrCode->deleted_at }}</td>
@@ -76,7 +82,7 @@
                 </tbody>
 
             </table>
-            
+
             <!-- Pagination Links -->
             <div class="d-flex justify-content-end mt-4">
                 <p class="mt-4">{{ $archivedQrCodes->links() }}</p>

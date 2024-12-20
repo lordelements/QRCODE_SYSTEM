@@ -45,6 +45,7 @@ Route::get('admin/show/{id}', [QRCodeController::class, 'show'])->name('admin.sh
 Route::post('store/qr_code', [QRCodeController::class, 'store'])->name('store.qr_code');
 
 Route::get('admin/{id}/download-qr-code', [QRCodeController::class, 'downloadQrCode'])->name('admin.download_qr_code');
+Route::get('admin/{id}/download-qr-codeURL', [QRCodeController::class, 'downloadQrCodeURL'])->name('admin.download_qr_codeURL');
 
 Route::put('admin/update/{id}', [QRCodeController::class, 'update'])->name('admin.update');
 Route::delete('admin/delete/{id}', [QRCodeController::class, 'destroy'])->name('admin.destroy');

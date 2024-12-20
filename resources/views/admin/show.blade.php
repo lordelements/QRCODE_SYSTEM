@@ -2,17 +2,22 @@
 
 @section('content')
 
-<div class="card mb-3">
+<div class="card">
     <form action="{{ url('admin/show/'.$qr->id) }}" method="POST" enctype="multipart/form-data">
-        @csrf
-        @method('PUT')
-        <div class="position-relative">
-            <p  hidden>{{ $data = ' Owner Name: ' . $qr->owner_name . ', 
-                Device Name: ' . $qr->device_name . ', 
-                Device Type: ' . $qr->device_type }}</p>
-            <div class="position-absolute top-50 start-50 translate-middle">
-                <div class="card-body"> <img src="{{ asset($qr->qr_code_path) }}" alt="QR Code" class="img-thumbnail w-auto p-3"> </div>
+        <div class="card-body">
+            <div class="card-img-top p-3">
+                <h5 class="mb-4">Dynamically Generated QR Code:</h5>
+                {!! $generatedQrCode !!}
             </div>
+
+            @if ($storedQrCodeUrl)
+            <div class="card-img-top p-3">
+                <h5 class="mb-4">Stored QR Code:</h5>
+                <img src="{{ $storedQrCodeUrl }}" class="img-thumbnail p-3" alt="Stored QR Code" width="200">
+            </div>
+            @else
+            <p>No stored QR code found.</p>
+            @endif
         </div>
     </form>
 </div>
