@@ -33,7 +33,11 @@
                                 <label for="validationCustom02" class="form-label">Owner Name</label>
                                 <input type="text" class="form-control" name="owner_name" required>
                             </div>
-
+                            <div class="col-md-12 mt-2">
+                                <label for="color">Choose QR Code Color</label>
+                                <input type="color" class="rounded" id="color" name="color_picker" value="#000000" onchange="updateColorInput(this.value)">
+                                <input type="hidden" name="color" id="color_input" value="0,0,0">
+                            </div>
                             <div class="modal-footer">
                                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                                 <button type="submit" class="btn btn-primary">Save</button>
@@ -172,9 +176,29 @@
 
 @endsection
 
+<script>
+    function updateColorInput(hex) {
+        const rgb = hexToRgb(hex);
+        document.getElementById('color_input').value = `${rgb.r},${rgb.g},${rgb.b}`;
+    }
+
+    function hexToRgb(hex) {
+        const bigint = parseInt(hex.slice(1), 16);
+        return {
+            r: (bigint >> 16) & 255,
+            g: (bigint >> 8) & 255,
+            b: bigint & 255
+        };
+    }
+</script>
+
 <style>
-    .custom-tooltip {
-        --bs-tooltip-bg: var(--bd-violet-bg);
-        --bs-tooltip-color: var(--bs-white);
+    input[type="color" i] {
+        border-radius: 50%;
+        inline-size: 30px;
+        block-size: 30px;
+        border-width: 1px;
+        border-style: solid;
+        border-color: rgb(153, 153, 153);
     }
 </style>

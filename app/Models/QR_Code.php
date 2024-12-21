@@ -21,6 +21,7 @@ class QR_Code extends Model
         'device_name',
         'owner_name',
         'qr_code_path', // Path to the generated QR code
+        'color',
     ];
 
     protected $dates = ['deleted_at']; // For soft delete timestamps

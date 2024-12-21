@@ -26,6 +26,7 @@ class QRCodeController extends Controller
             'device_type' => 'required|string',
             'device_name' => 'required|string',
             'owner_name' => 'required|string',
+            'color' => 'required|string|regex:/^\d{1,3},\d{1,3},\d{1,3}$/', // Validate RGB format
         ]);
 
         // Create the database record
@@ -43,10 +44,13 @@ class QRCodeController extends Controller
         // Generate the QR code and save it as an image
         $qrCodePath = 'qrcodes_generated/' . $qrCodeRecord->id . '.png';
 
+        // Parse the chosen color (e.g., "255,0,0")
+        [$red, $green, $blue] = explode(',', $validatedData['color']);
+
         $qrCodeContent = QrCode::size(300)
             ->style('dot')
             ->eye('circle')
-            ->color(0, 0, 255)
+            ->color($red, $green, $blue)
             ->margin(1)
             ->format('png')
             ->generate($scanUrl);
@@ -60,84 +64,6 @@ class QRCodeController extends Controller
         // Redirect back with a success message
         return redirect()->back()->with('status', 'QR Code created successfully.');
     }
-
-    // public function store(Request $request)
-    // {
-    //     // Validate the input data
-    //     $validatedData = $request->validate([
-    //         'device_type' => 'required|string',
-    //         'device_name' => 'required|string',
-    //         'owner_name' => 'required|string',
-    //     ]);
-
-    //     // Create the device record
-    //     $device = Qr_Code::create($validatedData);
-
-    //     // Generate QR Code data containing device details
-    //     $data = 'ID: ' . $device->id . "\n" .
-    //         'Owner: ' . $device->owner_name . "\n" .
-    //         'Device: ' . $device->device_name . "\n" .
-    //         'Type: ' . $device->device_type;
-
-
-    //     // $scanUrl = route($data, ['id' => $device->id]);
-
-    //     // Generate QR code with embedded payload (e.g., device ID or encoded JSON)
-    //     $payload = json_encode([
-    //         'id' => $device->id,
-    //     ]);
-
-    //     $qrCodePath = 'qrcodes_generated/' . $device->id . '.png';
-
-    //     // Generate and save the QR code
-    //     QrCode::size(300)
-    //         ->style('dot')
-    //         ->eye('circle')
-    //         ->color(0, 0, 255)
-    //         ->margin(1)
-    //         ->format('png')
-    //         ->generate($payload, public_path($qrCodePath));
-
-    //     // Save the QR code path to the device record
-    //     $device->update(['qr_code_path' => $qrCodePath]);
-
-    //     return redirect()->back()->with('status', 'Device created successfully!');
-    // }
-
-    // public function store(Request $request)
-    // {
-    //     // Validate the input data
-    //     $validatedData = $request->validate([
-    //         'device_type' => 'required|string',
-    //         'device_name' => 'required|string',
-    //         'owner_name' => 'required|string',
-    //     ]);
-
-    //     // Create the device record
-    //     $device = Qr_Code::create($validatedData);
-
-    //     // Embed device details or unique identifier in the QR code data
-    //      $data = 'ID: ' . $device->id . "\n" .
-    //         'Owner: ' . $device->owner_name . "\n" .
-    //         'Device: ' . $device->device_name . "\n" .
-    //         'Type: ' . $device->device_type;
-
-    //     $qrCodePath = 'qrcodes_generated/' . $device->id . '.png';
-
-    //     // Generate and save the QR code
-    //     QrCode::size(300)
-    //         ->style('dot')
-    //         ->eye('circle')
-    //         ->color(0, 0, 255)
-    //         ->margin(1)
-    //         ->format('png')
-    //         ->generate($data, public_path($qrCodePath));
-
-    //     // Save the QR code path to the device record
-    //     $device->update(['qr_code_path' => $qrCodePath]);
-
-    //     return redirect()->back()->with('status', 'Device created successfully!');
-    // }
 
     public function editForm($id) // QR Code Edit Form
     {
@@ -154,6 +80,7 @@ class QRCodeController extends Controller
             'device_type' => 'required|string|in:Laptop,Tablet,Phone,Earphone,Other',
             'device_name' => 'required|string',
             'owner_name' => 'required|string',
+            'color' => 'required|string|regex:/^\d{1,3},\d{1,3},\d{1,3}$/', // Validate RGB format
         ]);
 
         // Fetch the device by UUID
@@ -168,10 +95,13 @@ class QRCodeController extends Controller
         // Generate the QR code and save it as an image
         $qrCodePath = 'qrcodes_generated/' . $qrCode->id . '.png';
 
+        // Parse the chosen color (e.g., "255,0,0")
+        [$red, $green, $blue] = explode(',', $validatedData['color']);
+
         $qrCodeContent = QrCode::size(300)
             ->style('dot')
             ->eye('circle')
-            ->color(0, 0, 255)
+            ->color($red, $green, $blue)
             ->margin(1)
             ->format('png')
             ->generate($scanUrl);
@@ -407,11 +337,15 @@ class QRCodeController extends Controller
         // Generate the URL for showing details
         // $detailsUrl = route('qr-code.details', ['id' => $device->id]);
 
+        // Parse the chosen color (e.g., "255,0,0")
+        [$red, $green, $blue] = explode(',', $device['color']);
+
+
         // Generate QR Code as a PNG
         $qrCode = QrCode::format('png')
             ->style('dot')
             ->eye('circle')
-            ->color(0, 0, 255)
+            ->color($red, $green, $blue)
             ->margin(1)
             ->size(300)->generate($data);
 
